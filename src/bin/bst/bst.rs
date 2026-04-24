@@ -1,9 +1,9 @@
 use std::collections::VecDeque;
-use std::io::{self, Write};
+use std::io;
 
 #[derive(Debug)]
-struct Node {
-    value: i32,
+pub struct Node {
+    pub value: i32,
     left: Option<Box<Node>>,
     right: Option<Box<Node>>,
 }
@@ -18,16 +18,16 @@ impl Node {
     }
 }
 
-struct BinarySearchTree {
+pub struct BinarySearchTree {
     root: Option<Box<Node>>,
 }
 
 impl BinarySearchTree {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { root: None }
     }
 
-    fn insert(&mut self, value: i32) {
+    pub fn insert(&mut self, value: i32) {
         if self.root.is_none() {
             self.root = Some(Box::new(Node::new(value)));
             return;
@@ -53,7 +53,7 @@ impl BinarySearchTree {
         }
     }
 
-    fn search(&self, value: i32) -> Option<&Node> {
+    pub fn search(&self, value: i32) -> Option<&Node> {
         let mut current = self.root.as_deref();
 
         while let Some(node) = current {
@@ -69,7 +69,7 @@ impl BinarySearchTree {
         None
     }
 
-    fn calculate_height(&self) -> i32 {
+    pub fn calculate_height(&self) -> i32 {
         Self::calculate_height_node(self.root.as_deref())
     }
 
@@ -84,7 +84,7 @@ impl BinarySearchTree {
         }
     }
 
-    fn remove(&mut self, value: i32) {
+    pub fn remove(&mut self, value: i32) {
         self.root = Self::remove_node(self.root.take(), value);
     }
 
@@ -122,11 +122,10 @@ impl BinarySearchTree {
         while let Some(left) = node.left.as_deref() {
             node = left;
         }
-
         node.value
     }
 
-    fn print_tree(&self) {
+    pub fn print_tree(&self) {
         Self::print_tree_node(self.root.as_deref());
     }
 
@@ -138,7 +137,7 @@ impl BinarySearchTree {
         }
     }
 
-    fn print_by_level(&self) {
+    pub fn print_by_level(&self) {
         if self.root.is_none() {
             return;
         }
@@ -183,7 +182,7 @@ impl BinarySearchTree {
     }
 }
 
-fn read_i32() -> Result<i32, String> {
+pub fn read_i32() -> Result<i32, String> {
     let mut input = String::new();
 
     io::stdin()
@@ -191,88 +190,4 @@ fn read_i32() -> Result<i32, String> {
         .map_err(|e| e.to_string())?;
 
     input.trim().parse::<i32>().map_err(|e| e.to_string())
-}
-
-fn main() {
-    let mut bst = BinarySearchTree::new();
-    let mut choice = -1;
-
-    println!("BSTree");
-
-    while choice != 0 {
-        println!(
-            "\n[1]- Add node \
-             \n[2]- Search node by value \
-             \n[3]- Calculate height \
-             \n[4]- Remove node \
-             \n[5]- Show complete tree (increases size significantly from height > 5) \
-             \n[6]- Show tree in ascending order \
-             \n[0]- Exit"
-        );
-
-        print!("> ");
-        io::stdout().flush().unwrap();
-
-        match read_i32() {
-            Ok(value) => choice = value,
-            Err(e) => {
-                println!("error found {}", e);
-                continue;
-            }
-        }
-
-        match choice {
-            0 => {}
-
-            1 => {
-                print!("Insert node value: ");
-                io::stdout().flush().unwrap();
-
-                match read_i32() {
-                    Ok(value) => bst.insert(value),
-                    Err(e) => println!("error found {}", e),
-                }
-            }
-
-            2 => {
-                print!("Insert the value you want to search: ");
-                io::stdout().flush().unwrap();
-
-                match read_i32() {
-                    Ok(value) => match bst.search(value) {
-                        Some(found_node) => println!("Value {} found.", found_node.value),
-                        None => println!("Value {} not found.", value),
-                    },
-                    Err(e) => println!("error found {}", e),
-                }
-            }
-
-            3 => {
-                println!("Tree height: {}", bst.calculate_height());
-            }
-
-            4 => {
-                print!("Insert the value of the node you want to remove: ");
-                io::stdout().flush().unwrap();
-
-                match read_i32() {
-                    Ok(value) => bst.remove(value),
-                    Err(e) => println!("error found {}", e),
-                }
-            }
-
-            5 => {
-                bst.print_by_level();
-                println!();
-            }
-
-            6 => {
-                println!();
-                bst.print_tree();
-                println!();
-            }
-
-            _ => println!("Insert a valid value."),
-        }
-    }
 }
