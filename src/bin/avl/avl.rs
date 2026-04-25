@@ -46,47 +46,51 @@ impl AVLTree {
         false
     }
 
-    pub fn insert(&mut self, key: i32) {
-        self.root = Some(Self::insert_node(self.root.take(), key));
+    pub fn insert(&mut self, key: i32) -> bool {
+        let (new_root, inserted) = Self::insert_node(self.root.take(), key);
+        self.root = Some(new_root);
+        inserted
     }
-
-    fn insert_node(node: Option<Box<Node>>, key: i32) -> Box<Node> {
+    
+    fn insert_node(node: Option<Box<Node>>, key: i32) -> (Box<Node>, bool) {
         let Some(mut node) = node else {
-            return Box::new(Node::new(key));
+            return (Box::new(Node::new(key)), true);
         };
-
+    
+        let inserted;
+    
         if key < node.key {
-            node.left = Some(Self::insert_node(node.left.take(), key));
+            let (new_left, did_insert) = Self::insert_node(node.left.take(), key);
+            node.left = Some(new_left);
+            inserted = did_insert;
         } else if key > node.key {
-            node.right = Some(Self::insert_node(node.right.take(), key));
+            let (new_right, did_insert) = Self::insert_node(node.right.take(), key);
+            node.right = Some(new_right);
+            inserted = did_insert;
         } else {
-            println!("Value already exists. It will not be inserted.");
-            return node;
+            return (node, false);
         }
-
+    
         Self::update_height(&mut node);
-
+    
         let balance = Self::get_balance_factor(Some(&node));
-
+    
         if balance > 1 && key < node.left.as_ref().unwrap().key {
-            return Self::rotate_right(node);
+            return (Self::rotate_right(node), inserted);
         }
-
         if balance < -1 && key > node.right.as_ref().unwrap().key {
-            return Self::rotate_left(node);
+            return (Self::rotate_left(node), inserted);
         }
-
         if balance > 1 && key > node.left.as_ref().unwrap().key {
             node.left = Some(Self::rotate_left(node.left.take().unwrap()));
-            return Self::rotate_right(node);
+            return (Self::rotate_right(node), inserted);
         }
-
         if balance < -1 && key < node.right.as_ref().unwrap().key {
             node.right = Some(Self::rotate_right(node.right.take().unwrap()));
-            return Self::rotate_left(node);
+            return (Self::rotate_left(node), inserted);
         }
-
-        node
+    
+        (node, inserted)
     }
 
     pub fn remove(&mut self, value: i32) {

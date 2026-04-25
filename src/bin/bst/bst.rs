@@ -26,30 +26,31 @@ impl BinarySearchTree {
         Self { root: None }
     }
 
-    pub fn insert(&mut self, value: i32) {
+    pub fn insert(&mut self, value: i32) -> bool {
         if self.root.is_none() {
             self.root = Some(Box::new(Node::new(value)));
-            return;
+            return true;
         }
-
+    
         let mut current = self.root.as_mut();
-
+    
         while let Some(node) = current {
             if value < node.value && node.left.is_none() {
                 node.left = Some(Box::new(Node::new(value)));
-                break;
+                return true;
             } else if value > node.value && node.right.is_none() {
                 node.right = Some(Box::new(Node::new(value)));
-                break;
+                return true;
             } else if value == node.value {
-                println!("Value already exists. It will not be inserted.");
-                break;
+                return false;
             } else if value > node.value {
                 current = node.right.as_mut();
             } else {
                 current = node.left.as_mut();
             }
         }
+    
+        false
     }
 
     pub fn search(&self, value: i32) -> bool {

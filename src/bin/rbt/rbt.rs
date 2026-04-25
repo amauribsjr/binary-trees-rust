@@ -60,29 +60,28 @@ impl RBT {
         self.parent(node).and_then(|parent| self.nodes[parent].parent)
     }
 
-    pub fn insert(&mut self, key: i32) {
+    pub fn insert(&mut self, key: i32) -> bool {
+        if self.find_node(key).is_some() {
+            return false;
+        }
+    
         let z = self.nodes.len();
         self.nodes.push(Node::new(key));
-
+    
         let mut y: Link = None;
         let mut x = self.root;
-
+    
         while let Some(x_index) = x {
             y = x;
-
             if self.nodes[z].key < self.nodes[x_index].key {
                 x = self.nodes[x_index].left;
-            } else if self.nodes[z].key > self.nodes[x_index].key {
-                x = self.nodes[x_index].right;
             } else {
-                println!("Value already exists. It will not be inserted.");
-                self.nodes.pop();
-                return;
+                x = self.nodes[x_index].right;
             }
         }
-
+    
         self.nodes[z].parent = y;
-
+    
         if y.is_none() {
             self.root = Some(z);
         } else if self.nodes[z].key < self.nodes[y.unwrap()].key {
@@ -90,8 +89,9 @@ impl RBT {
         } else {
             self.nodes[y.unwrap()].right = Some(z);
         }
-
+    
         self.insert_fixup(z);
+        true
     }
 
     fn insert_fixup(&mut self, mut z: usize) {
