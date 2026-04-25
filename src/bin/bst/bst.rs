@@ -199,3 +199,9 @@ impl BinarySearchTree {
         }
     }
 }
+
+impl Default for BinarySearchTree {
+    fn default() -> Self {
+        Self::new()
+    }
+}
