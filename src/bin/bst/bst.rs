@@ -31,9 +31,9 @@ impl BinarySearchTree {
             self.root = Some(Box::new(Node::new(value)));
             return true;
         }
-    
+
         let mut current = self.root.as_mut();
-    
+
         while let Some(node) = current {
             if value < node.value && node.left.is_none() {
                 node.left = Some(Box::new(Node::new(value)));
@@ -49,7 +49,7 @@ impl BinarySearchTree {
                 current = node.left.as_mut();
             }
         }
-    
+
         false
     }
 
@@ -87,49 +87,49 @@ impl BinarySearchTree {
 
     pub fn remove(&mut self, value: i32) -> bool {
         let (new_root, removed) = Self::remove_node(self.root.take(), value);
-    
+
         self.root = new_root;
-    
+
         removed
     }
-    
+
     fn remove_node(current: Option<Box<Node>>, value: i32) -> (Option<Box<Node>>, bool) {
         let Some(mut node) = current else {
             return (None, false);
         };
-    
+
         if value < node.value {
             let (new_left, removed) = Self::remove_node(node.left.take(), value);
-    
+
             node.left = new_left;
-    
+
             (Some(node), removed)
         } else if value > node.value {
             let (new_right, removed) = Self::remove_node(node.right.take(), value);
-    
+
             node.right = new_right;
-    
+
             (Some(node), removed)
         } else {
             if node.left.is_none() && node.right.is_none() {
                 return (None, true);
             }
-    
+
             if node.left.is_none() {
                 return (node.right, true);
             }
-    
+
             if node.right.is_none() {
                 return (node.left, true);
             }
-    
+
             let successor_value = Self::smallest_value(node.right.as_deref().unwrap());
-    
+
             node.value = successor_value;
-    
+
             let (new_right, _) = Self::remove_node(node.right.take(), successor_value);
             node.right = new_right;
-    
+
             (Some(node), true)
         }
     }
@@ -203,5 +203,63 @@ impl BinarySearchTree {
 impl Default for BinarySearchTree {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn insert_and_search() {
+        let mut bst = BinarySearchTree::new();
+
+        assert!(bst.insert(10));
+        assert!(bst.insert(5));
+        assert!(bst.insert(15));
+
+        assert!(bst.search(10));
+        assert!(bst.search(5));
+        assert!(bst.search(15));
+        assert!(!bst.search(99));
+    }
+
+    #[test]
+    fn insert_duplicate_returns_false() {
+        let mut bst = BinarySearchTree::new();
+
+        assert!(bst.insert(10));
+        assert!(!bst.insert(10));
+    }
+
+    #[test]
+    fn remove_existing_value() {
+        let mut bst = BinarySearchTree::new();
+
+        for value in [10, 5, 15] {
+            bst.insert(value);
+        }
+
+        assert!(bst.remove(5));
+        assert!(!bst.search(5));
+        assert!(bst.search(10));
+        assert!(bst.search(15));
+    }
+
+    #[test]
+    fn remove_missing_value_returns_false() {
+        let mut bst = BinarySearchTree::new();
+
+        bst.insert(10);
+
+        assert!(!bst.remove(99));
+        assert!(bst.search(10));
+    }
+
+    #[test]
+    fn height_empty_tree_is_zero() {
+        let bst = BinarySearchTree::new();
+
+        assert_eq!(bst.calculate_height(), 0);
     }
 }
