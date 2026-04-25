@@ -245,15 +245,15 @@ impl RBT {
         }
     }
 
-    pub fn remove(&mut self, key: i32) {
+    pub fn remove(&mut self, key: i32) -> bool {
         let z = self.find_node(key);
-
+    
         if z.is_none() {
-            println!("Value {} not found.", key);
-            return;
+            return false;
         }
-
+    
         self.delete(z.unwrap());
+        true
     }
 
     fn transplant(&mut self, u: usize, v: Link) {

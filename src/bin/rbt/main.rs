@@ -83,7 +83,11 @@ fn main() {
                 io::stdout().flush().unwrap();
 
                 match read_i32() {
-                    Ok(value) => rbt.remove(value),
+                    Ok(value) => {
+                        if !rbt.remove(value) {
+                            println!("Value {} not found.", value);
+                        }
+                    }
                     Err(e) => println!("Error: {}", e),
                 }
             }
