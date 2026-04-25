@@ -18,7 +18,7 @@ The code prioritizes:
 
 * clarity over abstraction
 * explicit algorithmic steps
-* safe memory management (no unsafe usage at any condition)
+* implemented entirely in safe Rust (no unsafe blocks)
 * close correspondence with traditional textbook implementations
 
 ---
@@ -152,6 +152,18 @@ Remove: O(log n)
 
 ---
 
+## Public API Behavior
+
+The main operations return boolean values when appropriate:
+
+- insert(value) returns true if the value was inserted and false if it already exists
+- search(value) returns true if the value is found
+- remove(value) returns true if the value was removed and false if it does not exist
+
+This design keeps the data structure logic independent from user interaction, allowing the CLI to handle all output messages.
+
+---
+
 ## Design Decisions
 
 1. No unsafe code
@@ -214,6 +226,20 @@ Example:
 
 ---
 
+## Test implementation
+
+The test suite covers:
+
+- insertion and search
+- duplicate handling
+- removal of existing and missing values
+- height calculation for empty trees
+- AVL balancing behavior under ordered insertions
+
+Tests are implemented for all three structures (BST, AVL, and RBT).
+
+---
+
 ## Educational Notes
 
 This project is intended as a study reference.
@@ -224,17 +250,6 @@ Key aspects to observe:
 * how rotations restructure the tree
 * how AVL and RBT maintain balance differently
 * how Rust enforces memory safety in pointer-like structures
-
----
-
-## Possible Extensions
-
-* Generic support (T implementing Ord)
-* Tree iterators (in-order, pre-order, post-order)
-* Persistent (immutable) tree variants
-* Performance benchmarks comparing BST, AVL, and RBT
-* Graph visualization (Graphviz)
-* Unit and property-based tests
 
 ---
 
