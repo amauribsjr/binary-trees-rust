@@ -81,9 +81,15 @@ fn main() {
             4 => {
                 print!("Enter value to remove: ");
                 io::stdout().flush().unwrap();
-
+            
                 match read_i32() {
-                    Ok(value) => avl.remove(value),
+                    Ok(value) => {
+                        if avl.remove(value) {
+                            println!("Value {} removed.", value);
+                        } else {
+                            println!("Value {} not found.", value);
+                        }
+                    }
                     Err(e) => println!("Error: {}", e),
                 }
             }

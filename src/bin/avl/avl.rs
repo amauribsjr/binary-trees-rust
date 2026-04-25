@@ -93,59 +93,79 @@ impl AVLTree {
         (node, inserted)
     }
 
-    pub fn remove(&mut self, value: i32) {
-        self.root = Self::remove_node(self.root.take(), value);
+    pub fn remove(&mut self, value: i32) -> bool {
+        let (new_root, removed) = Self::remove_node(self.root.take(), value);
+    
+        self.root = new_root;
+    
+        removed
     }
-
-    fn remove_node(node: Option<Box<Node>>, value: i32) -> Option<Box<Node>> {
-        let mut node = node?;
-
+    
+    fn remove_node(node: Option<Box<Node>>, value: i32) -> (Option<Box<Node>>, bool) {
+        let Some(mut node) = node else {
+            return (None, false);
+        };
+    
+        let removed;
+    
         if value < node.key {
-            node.left = Self::remove_node(node.left.take(), value);
+            let (new_left, did_remove) = Self::remove_node(node.left.take(), value);
+    
+            node.left = new_left;
+            removed = did_remove;
         } else if value > node.key {
-            node.right = Self::remove_node(node.right.take(), value);
+            let (new_right, did_remove) = Self::remove_node(node.right.take(), value);
+    
+            node.right = new_right;
+            removed = did_remove;
         } else {
+            removed = true;
+    
             if node.left.is_none() && node.right.is_none() {
-                return None;
+                return (None, true);
             }
-
+    
             if node.left.is_none() {
-                return node.right;
+                return (node.right, true);
             }
-
+    
             if node.right.is_none() {
-                return node.left;
+                return (node.left, true);
             }
-
+    
             let successor_key = Self::smallest_value(node.right.as_deref().unwrap());
-
+    
             node.key = successor_key;
-            node.right = Self::remove_node(node.right.take(), successor_key);
+    
+            let (new_right, _) = Self::remove_node(node.right.take(), successor_key);
+            node.right = new_right;
         }
-
+    
         Self::update_height(&mut node);
-
+    
         let balance = Self::get_balance_factor(Some(&node));
-
+    
         if balance > 1 && Self::get_balance_factor(node.left.as_deref()) >= 0 {
-            return Some(Self::rotate_right(node));
+            return (Some(Self::rotate_right(node)), removed);
         }
-
+    
         if balance > 1 && Self::get_balance_factor(node.left.as_deref()) < 0 {
             node.left = Some(Self::rotate_left(node.left.take().unwrap()));
-            return Some(Self::rotate_right(node));
+    
+            return (Some(Self::rotate_right(node)), removed);
         }
-
+    
         if balance < -1 && Self::get_balance_factor(node.right.as_deref()) <= 0 {
-            return Some(Self::rotate_left(node));
+            return (Some(Self::rotate_left(node)), removed);
         }
-
+    
         if balance < -1 && Self::get_balance_factor(node.right.as_deref()) > 0 {
             node.right = Some(Self::rotate_right(node.right.take().unwrap()));
-            return Some(Self::rotate_left(node));
+    
+            return (Some(Self::rotate_left(node)), removed);
         }
-
-        Some(node)
+    
+        (Some(node), removed)
     }
 
     fn smallest_value(mut node: &Node) -> i32 {
