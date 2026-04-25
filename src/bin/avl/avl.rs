@@ -290,3 +290,9 @@ impl AVLTree {
         }
     }
 }
+
+impl Default for AVLTree {
+    fn default() -> Self {
+        Self::new()
+    }
+}
