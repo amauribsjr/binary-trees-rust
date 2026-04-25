@@ -85,38 +85,52 @@ impl BinarySearchTree {
         }
     }
 
-    pub fn remove(&mut self, value: i32) {
-        self.root = Self::remove_node(self.root.take(), value);
+    pub fn remove(&mut self, value: i32) -> bool {
+        let (new_root, removed) = Self::remove_node(self.root.take(), value);
+    
+        self.root = new_root;
+    
+        removed
     }
-
-    fn remove_node(current: Option<Box<Node>>, value: i32) -> Option<Box<Node>> {
-        let mut node = current?;
-
+    
+    fn remove_node(current: Option<Box<Node>>, value: i32) -> (Option<Box<Node>>, bool) {
+        let Some(mut node) = current else {
+            return (None, false);
+        };
+    
         if value < node.value {
-            node.left = Self::remove_node(node.left.take(), value);
-            Some(node)
+            let (new_left, removed) = Self::remove_node(node.left.take(), value);
+    
+            node.left = new_left;
+    
+            (Some(node), removed)
         } else if value > node.value {
-            node.right = Self::remove_node(node.right.take(), value);
-            Some(node)
+            let (new_right, removed) = Self::remove_node(node.right.take(), value);
+    
+            node.right = new_right;
+    
+            (Some(node), removed)
         } else {
             if node.left.is_none() && node.right.is_none() {
-                return None;
+                return (None, true);
             }
-
+    
             if node.left.is_none() {
-                return node.right;
+                return (node.right, true);
             }
-
+    
             if node.right.is_none() {
-                return node.left;
+                return (node.left, true);
             }
-
+    
             let successor_value = Self::smallest_value(node.right.as_deref().unwrap());
-
+    
             node.value = successor_value;
-            node.right = Self::remove_node(node.right.take(), successor_value);
-
-            Some(node)
+    
+            let (new_right, _) = Self::remove_node(node.right.take(), successor_value);
+            node.right = new_right;
+    
+            (Some(node), true)
         }
     }
 
