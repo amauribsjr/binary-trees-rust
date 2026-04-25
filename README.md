@@ -24,19 +24,19 @@ The code emphasizes:
 ---
 
 ## Project Structure
-
+```
 src/
 └── bin/
-  ├── bst/
-  │  ├── main.rs
-  │  └── bst.rs
-  ├── avl/
-  │  ├── main.rs
-  │  └── avl.rs
-  └── rbt/
-    ├── main.rs
-    └── rbt.rs
-
+    ├── bst/
+    │   ├── main.rs
+    │   └── bst.rs
+    ├── avl/
+    │   ├── main.rs
+    │   └── avl.rs
+    └── rbt/
+        ├── main.rs
+        └── rbt.rs
+```
 Each tree is implemented as a separate binary target.
 
 * `main.rs` handles the command-line interface
