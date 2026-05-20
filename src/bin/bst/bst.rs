@@ -31,9 +31,7 @@ impl BinarySearchTree {
             self.root = Some(Box::new(Node::new(value)));
             return true;
         }
-
         let mut current = self.root.as_mut();
-
         while let Some(node) = current {
             if value < node.value && node.left.is_none() {
                 node.left = Some(Box::new(Node::new(value)));
@@ -49,13 +47,11 @@ impl BinarySearchTree {
                 current = node.left.as_mut();
             }
         }
-
         false
     }
 
     pub fn search(&self, value: i32) -> bool {
         let mut current = self.root.as_deref();
-
         while let Some(node) = current {
             if value < node.value {
                 current = node.left.as_deref();
@@ -65,7 +61,6 @@ impl BinarySearchTree {
                 return true;
             }
         }
-
         false
     }
 
@@ -79,7 +74,6 @@ impl BinarySearchTree {
             Some(node) => {
                 let left_height = Self::calculate_height_node(node.left.as_deref());
                 let right_height = Self::calculate_height_node(node.right.as_deref());
-
                 1 + left_height.max(right_height)
             }
         }
@@ -87,9 +81,7 @@ impl BinarySearchTree {
 
     pub fn remove(&mut self, value: i32) -> bool {
         let (new_root, removed) = Self::remove_node(self.root.take(), value);
-
         self.root = new_root;
-
         removed
     }
 
@@ -97,39 +89,28 @@ impl BinarySearchTree {
         let Some(mut node) = current else {
             return (None, false);
         };
-
         if value < node.value {
             let (new_left, removed) = Self::remove_node(node.left.take(), value);
-
             node.left = new_left;
-
             (Some(node), removed)
         } else if value > node.value {
             let (new_right, removed) = Self::remove_node(node.right.take(), value);
-
             node.right = new_right;
-
             (Some(node), removed)
         } else {
             if node.left.is_none() && node.right.is_none() {
                 return (None, true);
             }
-
             if node.left.is_none() {
                 return (node.right, true);
             }
-
             if node.right.is_none() {
                 return (node.left, true);
             }
-
             let successor_value = Self::smallest_value(node.right.as_deref().unwrap());
-
             node.value = successor_value;
-
             let (new_right, _) = Self::remove_node(node.right.take(), successor_value);
             node.right = new_right;
-
             (Some(node), true)
         }
     }
@@ -138,7 +119,6 @@ impl BinarySearchTree {
         while let Some(left) = node.left.as_deref() {
             node = left;
         }
-
         node.value
     }
 
@@ -159,23 +139,16 @@ impl BinarySearchTree {
             println!("Tree is empty.");
             return;
         }
-
         let height = self.calculate_height();
         let mut queue: VecDeque<Option<&Node>> = VecDeque::new();
-
         queue.push_back(self.root.as_deref());
-
         let max_width = 2_i32.pow(height as u32) - 1;
-
         for level in 0..height {
             let level_size = queue.len();
             let spaces = max_width / 2_i32.pow((level + 1) as u32);
-
             Self::print_spaces(spaces);
-
             for _ in 0..level_size {
                 let current = queue.pop_front().unwrap();
-
                 if let Some(node) = current {
                     print!("{}", node.value);
                     queue.push_back(node.left.as_deref());
@@ -185,10 +158,8 @@ impl BinarySearchTree {
                     queue.push_back(None);
                     queue.push_back(None);
                 }
-
                 Self::print_spaces(spaces * 2 + 1);
             }
-
             println!();
         }
     }
@@ -209,15 +180,13 @@ impl Default for BinarySearchTree {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    
     #[test]
     fn insert_and_search() {
         let mut bst = BinarySearchTree::new();
-
         assert!(bst.insert(10));
         assert!(bst.insert(5));
         assert!(bst.insert(15));
-
         assert!(bst.search(10));
         assert!(bst.search(5));
         assert!(bst.search(15));
@@ -227,7 +196,6 @@ mod tests {
     #[test]
     fn insert_duplicate_returns_false() {
         let mut bst = BinarySearchTree::new();
-
         assert!(bst.insert(10));
         assert!(!bst.insert(10));
     }
@@ -239,7 +207,6 @@ mod tests {
         for value in [10, 5, 15] {
             bst.insert(value);
         }
-
         assert!(bst.remove(5));
         assert!(!bst.search(5));
         assert!(bst.search(10));
@@ -249,9 +216,7 @@ mod tests {
     #[test]
     fn remove_missing_value_returns_false() {
         let mut bst = BinarySearchTree::new();
-
         bst.insert(10);
-
         assert!(!bst.remove(99));
         assert!(bst.search(10));
     }
@@ -259,7 +224,6 @@ mod tests {
     #[test]
     fn height_empty_tree_is_zero() {
         let bst = BinarySearchTree::new();
-
         assert_eq!(bst.calculate_height(), 0);
     }
 }
