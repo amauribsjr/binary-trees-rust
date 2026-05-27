@@ -193,9 +193,9 @@ This design keeps the data structure logic independent from user interaction, al
 
 From the project root:
 
-cargo run --bin bst
-cargo run --bin avl
-cargo run --bin rbt
+`cargo run --bin bst`  
+`cargo run --bin avl`  
+`cargo run --bin rbt`  
 
 ---
 
